@@ -3,13 +3,13 @@
 class ApiController extends BaseController {
 
 	public function generateJSON() {
-		
+
 	}
 
 	public function uploadXML() {
 		$xmlFile = Input::file('xmlFile');
 
-		$this->removeOldEvents();
+		// $this->removeOldEvents();
 
 		$xml = simplexml_load_file($xmlFile);
 
