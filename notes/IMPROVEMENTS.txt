@@ -1,0 +1,2 @@
+- Have a live cache to use. (Redis?)
+- - Keep live copy of the JSON to return. When XML uploaded, not only ammend DB, but also modify the live copy.
