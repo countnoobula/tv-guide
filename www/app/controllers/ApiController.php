@@ -2,6 +2,10 @@
 
 class ApiController extends BaseController {
 
+	public function generateJSON() {
+		
+	}
+
 	public function uploadXML() {
 		$xmlFile = Input::file('xmlFile');
 
@@ -21,11 +25,11 @@ class ApiController extends BaseController {
 			$success = $this->addEvent($channelID, $node->starting_time, $node->title, $node->episode_title, $node->country, $node->genre, $node->parental_rating, $node->performer, $node->regie, $node->story_middle, $node->year);
 		}
 
-		return var_dump($channels);
+		return "Shows uploaded successfully.";
 	}
 
 	private function removeOldEvents() {
-		// delete events from previous day and earlier
+		Show::where("starting_time", "<", date('d.m.Y',strtotime("-1 days")))->delete();
 	}
 
 	private function getChannelID($channelName) {
@@ -40,19 +44,27 @@ class ApiController extends BaseController {
 		return $channel->id;
 	}
 
-	private function addEvent($channelID, $startingTime, $title, $episodeTitle = "", $country = "", $genre = "", $parentalRating = "", $performer = "", $regie = "", $storyMiddle = "", $year = "") {
-		// if show exists with startingTime and channelID
-		//   update show
-		//   return true
-		// else 
-		//   insert show
+	private function addEvent($channelID, $startingTime, $title, $episodeTitle, $country, $genre, $parentalRating, $performer, $regie, $storyMiddle, $year) {
+		$show = Show::whereRaw("starting_time = ? AND channel_id = ?", array($startingTime, $channelID));
+		if($show->count() == 0) {
+			$show = new Show();
+		}
 
-		/*
-			$queries = DB::getQueryLog();
-			$last_query = end($queries);
-			die(var_dump($last_query));
-		*/
+		$show->channel_id = $channelID;
+		$show->starting_time = date_create_from_format("d.m.Y H:i:s:u", $startingTime);
+		$show->title = $title;
+		$show->episode_title = $episodeTitle;
+		$show->country = $country;
+		$show->genre = $genre;
+		$show->parental_rating = $parentalRating;
+		$show->performer = $performer;
+		$show->regie = $regie;
+		$show->story_middle = $storyMiddle;
+		$show->year = $year;
 
+		$show->save();
+
+		// error handling
 		return true;
 	}
 }

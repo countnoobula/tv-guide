@@ -12,9 +12,19 @@ class CreateShowsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('channels', function($table) {
+		Schema::create('shows', function($table) {
 	        $table->increments('id');
-	        $table->string('name');
+	        $table->integer('channel_id')->references('id')->on('channels');
+	        $table->dateTime('starting_time');
+	        $table->string('title');
+	        $table->string('episode_title');
+	        $table->string('country');
+	        $table->string('genre');
+	        $table->string('parental_rating');
+	        $table->string('performer');
+	        $table->string('regie');
+	        $table->longText('story_middle');
+	        $table->string('year');
 	        $table->timestamps();
 	    });
 	}
@@ -26,7 +36,7 @@ class CreateShowsTable extends Migration {
 	 */
 	public function down()
 	{
-		//
+		Schema::drop('shows');
 	}
 
 }
