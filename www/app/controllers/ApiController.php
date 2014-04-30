@@ -32,8 +32,6 @@ class ApiController extends BaseController {
 					$currentShow = $s;
 					
 					if($previousShow != null) {
-						// TODO
-
 						$showsJSON[] = $this->getShowArray($s, $currentShow->starting_time, $showID, $currentTime);
 					}
 				} else {
@@ -66,6 +64,8 @@ class ApiController extends BaseController {
 				}
 				$showID++;
 			}
+
+			$showsJSON[] = $this->getShowArray($currentShow, date("Y-m-d H:i:s", mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1)), $showID, $currentTime);
 
 			// Do last show
 
