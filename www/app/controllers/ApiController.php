@@ -32,61 +32,9 @@ class ApiController extends BaseController {
 					$currentShow = $s;
 					
 					if($previousShow != null) {
-						$channelName = $previousShow->channel->name;
-						$url = "../shows/show.html";
-						$startingTime = $previousShow->starting_time;
-						$start = date('H:i', strtotime($previousShow->starting_time));
-						$end = date('H:i', strtotime($currentShow->starting_time));
-						$duration = (strtotime($end) - strtotime($start)) / 60;
-						$width = $duration * 6;
-						$title = $previousShow->title;
-						$episodeTitle = $previousShow->episode_title;
-						$country = $previousShow->country;
-						$genre = $previousShow->genre;
-						$parentalRating = $previousShow->parental_rating;
-						$performer = $previousShow->performer;
-						$regie = $previousShow->regie;
-						$storyMiddle = $previousShow->story_middle;
-						$year = $previousShow->year;
+						// TODO
 
-						$nextMidnight = mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1);
-						if(strtotime($currentShow->starting_time) > $nextMidnight && strtotime($previousShow->starting_time) < $nextMidnight) {
-							$end = date("H:i", $nextMidnight);
-							$duration = ($nextMidnight - strtotime($startingTime)) / 60;
-							$width = $duration * 6;
-							$needsEmpty = true;
-						}
-
-						$show = array();
-						$show['id'] = $showID;
-						$show['channel'] = $channelName;
-						$show['url'] = $url;
-						$show['starting_time'] = $startingTime;
-						$show['start'] = $start;
-						$show['end'] = $end;
-						$show['duration'] = $duration;
-						$show['width'] = $width;
-						$show['title'] = $title;
-						$show['episode_title'] = $episodeTitle;
-						$show['country'] = $country;
-						$show['genre'] = $genre;
-						$show['parental_rating'] = $parentalRating;
-						$show['performer'] = $performer;
-						$show['regie'] = $regie;
-						$show['story_middle'] = $storyMiddle;
-						$show['year'] = $year;
-
-						if($show['duration'] <= 15) {
-							$show['isNarrow'] = true;
-						}
-						if((strtotime($show['starting_time']) + ($duration * 60)) < $currentTime) {
-							$show['isDisabled'] = true;	
-						}
-						if((strtotime($startingTime) + ($duration * 60)) > $currentTime && (strtotime($startingTime)) < $currentTime) {
-							$show['isCurrent'] = true;
-						}
-
-						$showsJSON[] = $show;
+						$showsJSON[] = $this->getShowArray($s, $currentShow->starting_time, $showID, $currentTime);
 					}
 				} else {
 					$show = array();
@@ -152,6 +100,64 @@ class ApiController extends BaseController {
 
 	private function removeOldEvents() {
 		Show::where("starting_time", "<", date('d.m.Y'))->delete();
+	}
+
+	private function getShowArray($show, $endTime, $showID, $currentTime) {
+		$channelName = $show->channel->name;
+		$url = "../shows/show.html";
+		$startingTime = $show->starting_time;
+		$start = date('H:i', strtotime($show->starting_time));
+		$end = date('H:i', strtotime($endTime));
+		$duration = (strtotime($end) - strtotime($start)) / 60;
+		$width = $duration * 6;
+		$title = $show->title;
+		$episodeTitle = $show->episode_title;
+		$country = $show->country;
+		$genre = $show->genre;
+		$parentalRating = $show->parental_rating;
+		$performer = $show->performer;
+		$regie = $show->regie;
+		$storyMiddle = $show->story_middle;
+		$year = $show->year;
+
+		$nextMidnight = mktime(0, 0, 0, date('n', strtotime($show->starting_time)), date('j', strtotime($show->starting_time)) + 1);
+		if(strtotime($endTime) > $nextMidnight && strtotime($show->starting_time) < $nextMidnight) {
+			$end = date("H:i", $nextMidnight);
+			$duration = ($nextMidnight - strtotime($startingTime)) / 60;
+			$width = $duration * 6;
+			$needsEmpty = true;
+		}
+
+		$newShow = array();
+		$newShow['id'] = $showID;
+		$newShow['channel'] = $channelName;
+		$newShow['url'] = $url;
+		$newShow['starting_time'] = $startingTime;
+		$newShow['start'] = $start;
+		$newShow['end'] = $end;
+		$newShow['duration'] = $duration;
+		$newShow['width'] = $width;
+		$newShow['title'] = $title;
+		$newShow['episode_title'] = $episodeTitle;
+		$newShow['country'] = $country;
+		$newShow['genre'] = $genre;
+		$newShow['parental_rating'] = $parentalRating;
+		$newShow['performer'] = $performer;
+		$newShow['regie'] = $regie;
+		$newShow['story_middle'] = $storyMiddle;
+		$newShow['year'] = $year;
+
+		if($newShow['duration'] <= 15) {
+			$newShow['isNarrow'] = true;
+		}
+		if((strtotime($newShow['starting_time']) + ($duration * 60)) < $currentTime) {
+			$newShow['isDisabled'] = true;	
+		}
+		if((strtotime($startingTime) + ($duration * 60)) > $currentTime && (strtotime($startingTime)) < $currentTime) {
+			$newShow['isCurrent'] = true;
+		}
+
+		return $newShow;
 	}
 
 	private function getChannelID($channelName) {
