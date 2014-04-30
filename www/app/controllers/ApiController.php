@@ -54,7 +54,7 @@ class ApiController extends BaseController {
 						$nextMidnight = mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1);
 						if(strtotime($currentShow->starting_time) > $nextMidnight && strtotime($previousShow->starting_time) < $nextMidnight) {
 							$end = date("H:i", $nextMidnight);
-							$duration = (strtotime($end) - strtotime($startingTime)) / 60;
+							$duration = ($nextMidnight - strtotime($startingTime)) / 60;
 							$needsEmpty = true;
 						}
 
