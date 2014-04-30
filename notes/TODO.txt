@@ -6,4 +6,6 @@
 
 - $previousShow->channel->name; should be cached into a map, linked to ID. (Not sure if it caches it or how it deals with this, but in the event that it makes the same query every time, it could get really inefficient even for something small. Other option is to figure how to use the Laravel joins function)
 
-- Look into strtotime performance and alternative
+- Improve date handling
+
+- Use Laravel form builder
