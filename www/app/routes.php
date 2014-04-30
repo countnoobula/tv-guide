@@ -21,3 +21,5 @@ Route::get('/api/upload', function()
     return View::make('upload');
 });
 Route::post('/api/upload', 'ApiController@uploadXML');
+Route::get('/api/get', 'ApiController@generateJSON');
+Route::get('/api/get/{id}', 'ApiController@generateJSON');

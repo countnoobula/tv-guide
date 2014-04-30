@@ -2,8 +2,113 @@
 
 class ApiController extends BaseController {
 
-	public function generateJSON() {
+	public function generateJSON($channelID = -1) {
+		$generateJSON = array();
 
+		if($channelID == -1) {
+			$shows = Show::orderBy('starting_time', 'ASC')->join('channels', 'shows.channel_id', '=', 'channels.id');
+		} else {
+			$channel = Channel::find($channelID);
+			$shows = ($channel != null ? Show::where('channel_id', '=', $channelID)->orderBy('starting_time', 'ASC') : null);
+		}
+
+		$generateJSON["hasTVGuideChannel"] = ($shows != null && $shows->count() > 0);
+
+		if($generateJSON["hasTVGuideChannel"]) {
+			$channels = array();
+
+			$showsJSON = array();
+			$shows = $shows->get();
+			$currentTime = time("Y-m-d H:i:s");
+
+			$showID = 0;
+			$needsEmpty = false;
+			$previousShow = null;
+			$currentShow = null;
+
+			foreach ($shows as $s) {
+				if(!$needsEmpty) {
+					$previousShow = $currentShow;
+					$currentShow = $s;
+					
+					if($previousShow != null) {
+						$channelName = $previousShow->channel->name;
+						$url = "../shows/show.html";
+						$startingTime = $previousShow->starting_time;
+						$start = date('H:i', strtotime($previousShow->starting_time));
+						$end = date('H:i', strtotime($currentShow->starting_time));
+						$duration = (strtotime($end) - strtotime($start)) / 60;
+						$width = $duration * 6;
+						$title = $previousShow->title;
+						$episodeTitle = $previousShow->episode_title;
+						$country = $previousShow->country;
+						$genre = $previousShow->genre;
+						$parentalRating = $previousShow->parental_rating;
+						$performer = $previousShow->performer;
+						$regie = $previousShow->regie;
+						$storyMiddle = $previousShow->story_middle;
+						$year = $previousShow->year;
+
+						$show = array();
+						$show['id'] = $showID;
+						$show['channel'] = $channelName;
+						$show['url'] = $url;
+						$show['starting_time'] = $startingTime;
+						$show['start'] = $start;
+						$show['end'] = $end;
+						$show['duration'] = $duration;
+						$show['width'] = $width;
+						$show['title'] = $title;
+						$show['episode_title'] = $episodeTitle;
+						$show['country'] = $country;
+						$show['genre'] = $genre;
+						$show['parental_rating'] = $parentalRating;
+						$show['performer'] = $performer;
+						$show['regie'] = $regie;
+						$show['story_middle'] = $storyMiddle;
+						$show['year'] = $year;
+
+						if($show['duration'] <= 15) {
+							$show['isNarrow'] = true;
+						}
+						if((strtotime($show['starting_time']) + $duration) < $currentTime) {
+							$show['isDisabled'] = true;	
+						}
+						if((strtotime($show['starting_time']) + $duration) > $currentTime && (strtotime($show['starting_time'])) < $currentTime) {
+							$show['isCurrent'] = true;
+						}
+
+						$showsJSON[] = $show;
+					}
+				} else {
+					$show = array();
+
+					$startingTime = 0;
+					$start = 0;
+					$end = 0;
+					$duration = 0;
+					$width = 0;
+
+					$show['id'] = $showID;
+					$show['starting_time'] = $startingTime;
+					$show['start'] = $start;
+					$show['end'] = $end;
+					$show['duration'] = $duration;
+					$show['width'] = $width;
+					$show['isEmpty'] = true;
+
+					$showsJSON[] = $show;
+				}
+				$showID++;
+			}
+
+			// Do last show
+
+			$channels["shows"] = $showsJSON;
+			$generateJSON["tv_guide_channel"] = $channels;
+		}
+
+		return json_encode($generateJSON, JSON_UNESCAPED_SLASHES);
 	}
 
 	public function uploadXML() {
@@ -29,7 +134,7 @@ class ApiController extends BaseController {
 	}
 
 	private function removeOldEvents() {
-		Show::where("starting_time", "<", date('d.m.Y',strtotime("-1 days")))->delete();
+		Show::where("starting_time", "<", date('d.m.Y'))->delete();
 	}
 
 	private function getChannelID($channelName) {
