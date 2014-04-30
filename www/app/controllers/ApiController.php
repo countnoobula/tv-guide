@@ -26,6 +26,8 @@ class ApiController extends BaseController {
 			$previousShow = null;
 			$currentShow = null;
 
+			//return date("Y-m-d H:i:s", $currentTime);
+
 			foreach ($shows as $s) {
 				if(!$needsEmpty) {
 					$previousShow = $currentShow;
@@ -49,6 +51,13 @@ class ApiController extends BaseController {
 						$storyMiddle = $previousShow->story_middle;
 						$year = $previousShow->year;
 
+						$nextMidnight = mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1);
+						if(strtotime($currentShow->starting_time) > $nextMidnight && strtotime($previousShow->starting_time) < $nextMidnight) {
+							$end = date("H:i", $nextMidnight);
+							$duration = (strtotime($end) - strtotime($startingTime)) / 60;
+							$needsEmpty = true;
+						}
+
 						$show = array();
 						$show['id'] = $showID;
 						$show['channel'] = $channelName;
@@ -71,10 +80,10 @@ class ApiController extends BaseController {
 						if($show['duration'] <= 15) {
 							$show['isNarrow'] = true;
 						}
-						if((strtotime($show['starting_time']) + $duration) < $currentTime) {
+						if((strtotime($show['starting_time']) + ($duration * 60)) < $currentTime) {
 							$show['isDisabled'] = true;	
 						}
-						if((strtotime($show['starting_time']) + $duration) > $currentTime && (strtotime($show['starting_time'])) < $currentTime) {
+						if((strtotime($startingTime) + ($duration * 60)) > $currentTime && (strtotime($startingTime)) < $currentTime) {
 							$show['isCurrent'] = true;
 						}
 
@@ -83,11 +92,11 @@ class ApiController extends BaseController {
 				} else {
 					$show = array();
 
-					$startingTime = 0;
-					$start = 0;
-					$end = 0;
-					$duration = 0;
-					$width = 0;
+					$startingTime = date("Y-m-d H:i:s", mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1));
+					$start = date("H:i", strtotime($startingTime));
+					$end = date("H:i", strtotime($currentShow->starting_time));
+					$duration = (strtotime($currentShow->starting_time) - strtotime($startingTime)) / 60;
+					$width = $duration * 6;
 
 					$show['id'] = $showID;
 					$show['starting_time'] = $startingTime;
@@ -97,7 +106,13 @@ class ApiController extends BaseController {
 					$show['width'] = $width;
 					$show['isEmpty'] = true;
 
+					if((strtotime($show['starting_time']) + $duration) < $currentTime) {
+						$show['isDisabled'] = true;	
+					}
+
 					$showsJSON[] = $show;
+
+					$needsEmpty = false;
 				}
 				$showID++;
 			}
