@@ -67,8 +67,6 @@ class ApiController extends BaseController {
 
 			$showsJSON[] = $this->getShowArray($currentShow, date("Y-m-d H:i:s", mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1)), $showID, $currentTime);
 
-			// Do last show
-
 			$channels["shows"] = $showsJSON;
 			$generateJSON["tv_guide_channel"] = $channels;
 		}
@@ -79,7 +77,7 @@ class ApiController extends BaseController {
 	public function uploadXML() {
 		$xmlFile = Input::file('xmlFile');
 
-		// $this->removeOldEvents();
+		$this->removeOldEvents();
 
 		$xml = simplexml_load_file($xmlFile);
 
