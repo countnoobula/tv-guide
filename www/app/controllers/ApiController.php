@@ -105,6 +105,9 @@ class ApiController extends BaseController {
 					$show['width'] = $width;
 					$show['isEmpty'] = true;
 
+					if($show['duration'] <= 15) {
+						$show['isNarrow'] = true;
+					}
 					if((strtotime($show['starting_time']) + $duration) < $currentTime) {
 						$show['isDisabled'] = true;	
 					}
