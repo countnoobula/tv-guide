@@ -26,8 +26,6 @@ class ApiController extends BaseController {
 			$previousShow = null;
 			$currentShow = null;
 
-			//return date("Y-m-d H:i:s", $currentTime);
-
 			foreach ($shows as $s) {
 				if(!$needsEmpty) {
 					$previousShow = $currentShow;
@@ -55,6 +53,7 @@ class ApiController extends BaseController {
 						if(strtotime($currentShow->starting_time) > $nextMidnight && strtotime($previousShow->starting_time) < $nextMidnight) {
 							$end = date("H:i", $nextMidnight);
 							$duration = ($nextMidnight - strtotime($startingTime)) / 60;
+							$width = $duration * 6;
 							$needsEmpty = true;
 						}
 
