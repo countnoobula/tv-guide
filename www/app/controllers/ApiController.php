@@ -15,8 +15,6 @@ class ApiController extends BaseController {
 		$generateJSON["hasTVGuideChannel"] = ($shows != null && $shows->count() > 0);
 
 		if($generateJSON["hasTVGuideChannel"]) {
-			$channels = array();
-
 			$showsJSON = array();
 			$shows = $shows->get();
 			$currentTime = time("Y-m-d H:i:s");
@@ -65,10 +63,9 @@ class ApiController extends BaseController {
 				$showID++;
 			}
 
-			$showsJSON[] = $this->getShowArray($currentShow, date("Y-m-d H:i:s", mktime(0, 0, 0, date('n', strtotime($previousShow->starting_time)), date('j', strtotime($previousShow->starting_time)) + 1)), $showID, $currentTime);
+			$showsJSON[] = $this->getShowArray($currentShow, date("Y-m-d H:i:s", mktime(0, 0, 0, date('n', strtotime($currentShow->starting_time)), date('j', strtotime($currentShow->starting_time)) + 1)), $showID, $currentTime);
 
-			$channels["shows"] = $showsJSON;
-			$generateJSON["tv_guide_channel"] = $channels;
+			$generateJSON["tv_guide_channel"] = array("shows" => $showsJSON);
 		}
 
 		return json_encode($generateJSON, JSON_UNESCAPED_SLASHES);
@@ -190,7 +187,6 @@ class ApiController extends BaseController {
 
 		$show->save();
 
-		// error handling
 		return true;
 	}
 }
