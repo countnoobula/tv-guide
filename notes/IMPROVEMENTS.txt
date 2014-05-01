@@ -1,4 +1,4 @@
-- Have a live cache to use. (Redis?)
+- Have a live cache to use. (Redis? Node?)
 - - Keep live copy of the JSON to return. When XML uploaded, not only ammend DB, but also modify the live copy.
 
 - Adjust Nginx to handle be more API-like. (A few settings to tweak for basic caching, etc).
