@@ -4,7 +4,9 @@
 
 - Handle shows that go over midnight
 
-- $previousShow->channel->name; should be cached into a map, linked to ID. (Not sure if it caches it or how it deals with this, but in the event that it makes the same query every time, it could get really inefficient even for something small. Other option is to figure how to use the Laravel joins function)
+- $previousShow->channel->name; 
+- - Investigate usage and find out if queried or cached. Need to optimise if queried.
+- - Find out about calling fields from joined table in Eloquent
 
 - Improve date handling
 
