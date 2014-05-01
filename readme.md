@@ -1,4 +1,4 @@
-Small TV converter between XML and JSON
+Small TV guide converter between XML and JSON
 - Uses Laravel 4.
 - Vagrant setup from https://github.com/bryannielsen/Laravel4-Vagrant
 
@@ -13,4 +13,4 @@ Routes setup as the following:
 Benchmark info:
 - Box runs single core + 400mb RAM.
 - Served 2000 requests at 5 concurrency in 1400 seconds without any failure.
-- Average request time: 3 seconds.
+- Average request time: 3.5 seconds.
